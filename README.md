@@ -7,9 +7,6 @@
 ## 使用方法
 
 ###  青龙面板
-- 拉取仓库
-  ```
-  ql repo https://github.com/Shawn220528/scripts.git
 
 ## 特别声明
 
