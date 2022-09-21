@@ -2,7 +2,7 @@
  作者：shawn
  日期：9.17 更新评论
  日期：9.19 处理下网络异常导致无法刷新token，导致token失效问题
- 李渡小程序
+ 小程序:李渡国粉之家
  抓取域名 https://gfzj.lidujiu.com/mobileApi/oauth/wechat/login? 返回body里面的refreshToken
  抓取之后不要再登录了，不然会掉线
  在拉取库外面目录/ql/scripts新增ldgfzj.txt 把token放进去 多个账号@隔开
