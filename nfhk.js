@@ -5,7 +5,8 @@
  抓包https://wxapi.csair.com/marketing-tools/activity/join?type=APPTYPE&chanel=ss&lang=zh
  变量格式：export nfhkCk='cookie1'@'cookie2' 多账户 换行 或者 @ 分割
  定时1天一次
- Cron：15 12 * * *
+ const $ = new Env("南方航空app")
+ cron: 1 28 2 * * *
  [task_local]
  #南方航空
  [rewrite_local]
