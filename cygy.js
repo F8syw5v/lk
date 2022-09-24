@@ -2,7 +2,7 @@
 小程序：成语果园
 抓包：tree-prod.graylog.chimps.cn 的 Authorization 的值 
 填在下面的token里面 用@分割
-cron: 20 */6 * * *
+
 */
 
 
