@@ -2,11 +2,12 @@
 小程序：成语果园
 抓包：tree-prod.graylog.chimps.cn 的 Authorization 的值 
 填在下面的token里面 用@分割
-
+cron: 20 */6 * * *
 */
 
 
-const $ = Env("成语果园")
+const $ = new Env("成语果园")
+
 
 
 let token = "DOGyCr2pJYKybDwDnu05bvZImmxWfjZO88cTbbZLGqMIHM1mW6fdyBOvcKPSpaKfAyIkO1ELK1XcTiu8dWcait_qxEyCvpCAvGIkl_jl1Q4"
