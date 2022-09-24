@@ -53,9 +53,9 @@ $.message = ''
         }
       }
     } else {
-      if (process.env.zzkdhd && process.env.zzkdhd.indexOf('@') > -1) {
-        zzkdhdArr = process.env.zzkdhd.split('@');
-        console.log(`您选择的是用"@"隔开\n`)
+      if (process.env.zzkdhd && process.env.zzkdhd.indexOf('\n') > -1) {
+        zzkdhdArr = process.env.zzkdhd.split('\n');
+        console.log(`您选择的是用"换行"隔开\n`)
       } else {
         zzkdhds = [process.env.zzkdhd]
       };
