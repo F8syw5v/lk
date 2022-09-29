@@ -5,7 +5,7 @@
 登录微信小程序后，捉header里的token，填到gqcqWxCookie里，多账号换行或@或&隔开
 
 定时每天一次
-cron: 33 9 * * *
+cron: 8 33 8 * * *
 */
 const $ = new Env("广汽传祺-微信小程序");
 
