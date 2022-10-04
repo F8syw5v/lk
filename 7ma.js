@@ -1,11 +1,13 @@
 /**
+*收益：兑换7ma出行的骑行券，有7MA出行的可以试试
  * 作者: QQ1483081359 欢迎前来提交bug
  * 软件：7MA出行每日签到、看广告得积分  每天18积分，188积分可换3次免费骑行
  * 抓包：”7MA出行“微信小程序或者app都可以，抓newmapi.7mate.cn这个域名下 hearders 部分的 Authorization ,把抓到的值去掉前面的Bearer，只保留 eyJ0eXAiOiJKxxxxxxxxxxx 后面这部分
  * 变量：mateToken  多个账号 换行分割 或者 新建变量
  * 定时一天一次
  * cron: 10 8 * * *
-
+ 
+ 
  [task_local]
  #7MA出行
  10 8 * * * https://raw.githubusercontent.com/zhacha222/NoteJS/main/7ma.js, tag=7MA出行, enabled=true
@@ -20,7 +22,7 @@
 
  */
 //cron: 10 8 * * *
-
+const $ = new Env("7MA出行");
 //===============通知设置=================//
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
 
