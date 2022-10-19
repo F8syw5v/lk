@@ -11,7 +11,6 @@
  * ========= 青龙 =========
  * 变量格式：export xboxtoken=' extra_data中的sid '  多个账号用 @分割 
  * 当前变量测试 extra_data中的sid  该参数:进入小程序后点击授权后开启抓包 随意进入一个页面抓链接h5.youzan.com中的请求体中的sid参数
- cron: 15 42 15 * * *
  */
 
  const xbox = "xbox俱乐部";
@@ -24,10 +23,10 @@
  let xboxtokenArr = [];
  let data = '';
  let msg = '';
- 
+ let githubproxy = "https://gh.api.99988866.xyz/"
+
  
  !(async () => {
- 
      if (!(await Envs()))  	//多账号分割 判断变量是否为空  初步处理多账号
          return;
      else {
@@ -38,7 +37,7 @@
              new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 +
              8 * 60 * 60 * 1000).toLocaleString()} \n=========================================\n`);
  
-         await wyy();
+         //await wyy(); //网易云API接口 失效则不能正常运行 
  
          console.log(`\n=================== 共找到 ${xboxtokenArr.length} 个账号 ===================`)
  
@@ -190,14 +189,7 @@
          }, timeout)
      })
  }
- 
- 
- 
- 
- 
- 
- 
- 
+
  
  
  
