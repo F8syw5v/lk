@@ -101,7 +101,7 @@ def webhook(message, webhook_token):
 with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
     webhook_token = os.environ['QYWX_KEY']
     kfxtoken = os.environ['kfwsdCookie']
-    kfxtoken = kfxtoken.split('@')
+    kfxtoken = kfxtoken.split('\n')
     for i in range(3):
         for ck in kfxtoken:
             msg = exchange(ck)
