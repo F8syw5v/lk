@@ -24,8 +24,8 @@ update:
 """
 from requests import Session
 from json import dumps
-from tools.send_msg import push
-from tools.tool import timestamp, md5, print_now, get_environ
+from send_msg import push
+from tool import timestamp, md5, print_now, get_environ
 
 #sign = get_environ("SF_SIGN")
 #if sign == "":
