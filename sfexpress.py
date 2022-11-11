@@ -248,6 +248,7 @@ class SFExpress:
         self.query_score()
 
 
+
 if __name__ == "__main__":
     #多账号在这边修改 SF_SIGN2 SF_SIGN3
     sign = get_environ("SF_SIGN")
