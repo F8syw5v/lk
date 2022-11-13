@@ -24,11 +24,11 @@ from time import sleep
 from re import findall
 from requests import get, post
 from base64 import b64encode
-from tools.aes_encrypt import AES_Ctypt
-from tools.rsa_encrypt import RSA_Encrypt
-from tools.tool import timestamp, get_environ, print_now
-from tools.send_msg import push
-from login.telecom_login import TelecomLogin
+from aes_encrypt import AES_Ctypt
+from rsa_encrypt import RSA_Encrypt
+from tool import timestamp, get_environ, print_now
+from send_msg import push
+from telecom_login import TelecomLogin
 from string import ascii_letters, digits
 
 phone = get_environ("TELECOM_PHONE")
