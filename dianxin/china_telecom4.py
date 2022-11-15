@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 # -- coding: utf-8 --
 # -------------------------------
-
+# @Author : github@limoruirui https://github.com/limoruirui
+# @Time : 2022/9/12 16:10
 # -------------------------------
-# cron "1 12 * * *"
+# cron "59 59 11 * * *"
 # const $ = new Env('电信签到4');
 """
 1. 电信签到 不需要抓包 脚本仅供学习交流使用, 请在下载后24h内删除
@@ -31,13 +32,6 @@ from send_msg import push
 from telecom_login import TelecomLogin
 from string import ascii_letters, digits
 
-phone = get_environ("TELECOM_PHONE4")
-password = get_environ("TELECOM_PASSWORD4")
-foods = int(float(get_environ("TELECOM_FOOD4", 0, False)))
-if phone == "":
-    exit(0)
-if password == "":
-    print_now("电信服务密码未提供 只执行部分任务")
 
 
 class ChinaTelecom:
@@ -80,7 +74,8 @@ class ChinaTelecom:
                 split_text = text[(32 * i):(32 * (i + 1))]
                 encrypt_text += RSA_Encrypt(self.key).encrypt(split_text)
             return encrypt_text
-    def geneRandomToken(self):
+    @staticmethod
+    def geneRandomToken():
         randomList = choices(ascii_letters + digits, k=129)
         token = f"V1.0{''.join(x for x in randomList)}"
         return token
@@ -374,4 +369,11 @@ class ChinaTelecom:
 
 
 if __name__ == "__main__":
+    phone = get_environ("TELECOM_PHONE4")
+    password = get_environ("TELECOM_PASSWORD4")
+    foods = int(float(get_environ("TELECOM_FOOD4", 0, False)))
+    if phone == "":
+        exit(0)
+    if password == "":
+        print_now("电信服务密码未提供 只执行部分任务")
     ChinaTelecom(phone, password).main()
