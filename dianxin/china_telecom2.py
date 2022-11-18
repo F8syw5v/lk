@@ -3,15 +3,17 @@
 # -------------------------------
 # @Author : github@limoruirui https://github.com/limoruirui
 # @Time : 2022/9/12 16:10
+# cron "1 9,12 * * *" script-path=xxx.py,tag=匹配cron用
+# const $ = new Env('电信签到');
 # -------------------------------
-# cron "59 59 11 * * *"
-# const $ = new Env('电信签到2');
+
 """
 1. 电信签到 不需要抓包 脚本仅供学习交流使用, 请在下载后24h内删除
+2. cron说明 12点必须执行一次(用于兑换) 然后12点之外还需要执行一次(用于执行每日任务) 一天共两次 可直接使用默认cron
 2. 环境变量说明:
     必须  TELECOM_PHONE : 电信手机号
     选填  TELECOM_PASSWORD : 电信服务密码 填写后会执行更多任务
-    选填  TELECOM_FOOD  : 给宠物喂食次数 默认为0 不喂食 根据用户在网时长 每天可以喂食5-9次
+    选填  TELECOM_FOOD  : 给宠物喂食次数 默认为0 不喂食 根据用户在网时长 每天可以喂食5-10次
 3. 必须登录过 电信营业厅 app的账号才能正常运行
 """
 """
@@ -21,7 +23,7 @@ update:
 """
 from datetime import date, datetime
 from random import shuffle, randint, choices
-from time import sleep
+from time import sleep, strftime
 from re import findall
 from requests import get, post
 from base64 import b64encode
@@ -35,11 +37,11 @@ from string import ascii_letters, digits
 
 
 class ChinaTelecom:
-    def __init__(self, account, pwd):
+    def __init__(self, account, pwd, checkin=True):
         self.phone = account
         self.ticket = ""
         self.token = ""
-        if pwd != "":
+        if pwd != "" and checkin:
             userLoginInfo = TelecomLogin(account, pwd).main()
             self.ticket = userLoginInfo[0]
             self.token = userLoginInfo[1]
@@ -178,26 +180,31 @@ class ChinaTelecom:
     # 若连续签到为7天 则兑换
     def convert_reward(self):
         url = "https://wapside.189.cn:9001/jt-sign/reward/convertReward"
-        rewardId = self.query_signinfo()  # "baadc927c6ed4d8a95e28fa3fc68cb9"
+        try:
+            rewardId = self.query_signinfo()  # "baadc927c6ed4d8a95e28fa3fc68cb9"
+        except:
+            rewardId = "baadc927c6ed4d8a95e28fa3fc68cb9"
         if rewardId == "":
             return
         body = {
             "para": self.telecom_encrypt(
                 f'{{"phone":"{self.phone}","rewardId":"{rewardId}","month":"{date.today().__format__("%Y%m")}"}}')
         }
-        for i in range(5):
+        for i in range(10):
             data = self.req(url, "post", body)
             print_now(data)
             if data["code"] == "0":
                 break
-            sleep(3)
-        rewardId = self.query_signinfo()
-        if rewardId == "":
+            sleep(6)
+        reward_status = self.get_coin_info()
+        if reward_status:
             self.msg += f"账号{self.phone}连续签到7天兑换1元话费成功\n"
             print_now(self.msg)
+            push("电信签到兑换", self.msg)
         else:
             self.msg += f"账号{self.phone}连续签到7天兑换1元话费失败 明天会继续尝试兑换\n"
             print_now(self.msg)
+            push("电信签到兑换", self.msg)
 
 
     # 查询金豆数量
@@ -348,7 +355,7 @@ class ChinaTelecom:
         if foods != 0:
             for i in range(foods):
                 self.food()
-        self.convert_reward()
+        # self.convert_reward()
         if datetime.now().day == 1:
             self.get_level()
         self.share()
@@ -366,6 +373,16 @@ class ChinaTelecom:
         self.coin_info()
         self.msg += f"你账号{self.phone} 当前有金豆{self.coin_count['totalCoin']}"
         push("电信app签到", self.msg)
+    def get_coin_info(self):
+        url = "https://wapside.189.cn:9001/jt-sign/api/getCoinInfo"
+        decrept_para = f'{{"phone":"{self.phone}","pageNo":0,"pageSize":10,type:"1"}}'
+        data = {
+            "para": self.telecom_encrypt(decrept_para)
+        }
+        data = self.req(url, "POST", data)
+        if "skuName" in data["data"]["biz"]["results"][0] and "连续签到" in data["data"]["biz"]["results"][0]["skuName"]:
+            return True
+        return False
 
 
 if __name__ == "__main__":
@@ -376,4 +393,10 @@ if __name__ == "__main__":
         exit(0)
     if password == "":
         print_now("电信服务密码未提供 只执行部分任务")
-    ChinaTelecom(phone, password).main()
+    if datetime.now().hour + (8 - int(strftime("%z")[2])) == 12:
+        telecom = ChinaTelecom(phone, password, False)
+        telecom.init()
+        telecom.convert_reward()
+    else:
+        telecom = ChinaTelecom(phone, password)
+        telecom.main()
