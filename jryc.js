@@ -5,7 +5,7 @@ cron 10 8,10 * * *  shpj.js
 
 ========= 青龙--配置文件--贴心复制区域  ========= 
 # 今日越城
-export shpj=' x-session-id & x-request-id ' 
+export jryc=' x-session-id & x-request-id ' 
 
 
 多账号用 换行 或 @ 分割
