@@ -436,8 +436,8 @@ function getVersion(timeout = 3 * 1000) {
 // ============================================变量检查============================================ \\
 async function Envs() {
 	if (zmnlxq) {
-		if (zmnlxq.indexOf("@") != -1) {
-			zmnlxq.split("@").forEach((item) => {
+		if (zmnlxq.indexOf("\n") != -1) {
+			zmnlxq.split("\n").forEach((item) => {
 				zmnlxqArr.push(item);
 			});
 		} else {
