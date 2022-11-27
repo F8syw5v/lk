@@ -6,13 +6,13 @@
 # -------------------------------
 """
 aes加密解密工具 目前仅支持ECB/CBC 块长度均为128位 padding只支持pkcs7/zero_padding(aes中没有pkcs5 能用的pkcs5其实是执行的pkcs7) 后续有需要再加
-pycryptdemo限制 同一个aes加密对象不能即加密又解密 所以当加密和解密都需要执行时 需要重新new一个对象增加额外开销
+pycryptodome限制 同一个aes加密对象不能即加密又解密 所以当加密和解密都需要执行时 需要重新new一个对象增加额外开销
  -- A cipher object is stateful: once you have encrypted a message , you cannot encrypt (or decrypt) another message using the same object.　
 """
 try:
     from Crypto.Cipher import AES
 except:
-    print("检测到还未安装 pycryptdemo 请按照md的方法安装")
+    print("检测到还未安装 pycryptodome 请按照md的方法安装")
     exit(0)
 from binascii import b2a_hex, a2b_hex
 from base64 import b64encode, b64decode
