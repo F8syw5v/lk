@@ -11,6 +11,7 @@
 2. 环境变量说明:
    变量名(必须)：  TELECOM_PHONE_PASSWORD
    格式： 手机号&服务密码，1317xxx1322&123456
+   单个CK塞多个账号时，以#分隔开：手机号&服务密码#手机号&服务密码，1317xxx1322&123456#1317xxx1322&123456
 3. 必须登录过 电信营业厅 app的账号才能正常运行
 """
 import re
@@ -26,6 +27,7 @@ from tools.ql_api import get_envs, disable_env, post_envs, put_envs
 from tools.tool import timestamp, get_environ, print_now
 from tools.send_msg import push
 from china_telecom import ChinaTelecom
+import threading
 
 class TelecomLotter:
     def __init__(self, phone, password):
@@ -176,11 +178,12 @@ class TelecomLotter:
 def main(phone, password):
     apiType = 1
     try:
-        url = "https://api.ruirui.fun/telecom/getLiveInfo"
+        url = "https://gitee.com/kele2233/genxin/raw/master/telecomLiveInfo.json"
         data = get(url, timeout=5).json()
     except:
         try:
             url = "https://raw.githubusercontent.com/limoruirui/Hello-Wolrd/main/telecomLiveInfo.json"
+            #url = "https://api.ruirui.fun/telecom/getLiveInfo"
             data = get(url, timeout=5).json()
         except:
             url = "https://xbk.189.cn/xbkapi/lteration/index/recommend/anchorRecommend?provinceCode=01"
@@ -212,7 +215,6 @@ def main(phone, password):
 #获取ck
 def get_cookie():
     ck_list = []
-    pin = "null"
     cookie = None
     cookies = get_envs("TELECOM_PHONE_PASSWORD")
     for ck in cookies:
@@ -222,8 +224,36 @@ def get_cookie():
         print('共配置{}条CK,请添加环境变量,或查看环境变量状态'.format(len(ck_list)))
     return ck_list 
 
+
+def start(phone,password):
+    if phone == "" or password == "":
+        print("未填写相应变量 退出")
+        exit(0)
+    main(phone, password)
+    print("\n")
+
+
+
+
 if __name__ == '__main__':
-    user_map = get_cookie()
+    l = []
+    user_map = []
+    cklist = get_cookie()
+    for i in range(len(cklist)):
+        #以#分割开的ck
+        split1 = cklist[i].split("#")
+        if len(split1)>1:
+            for j in range(len(split1)):
+                split2 = split1[j].split("&")
+                if len(split2)>1:
+                    user_map.append(split1[j])
+        else:
+            userinfo = cklist[i].split("&")
+            if len(userinfo)>1:
+                user_map.append(cklist[i])
+
+
+
     for i in range(len(user_map)):
         phone=""
         password=""
@@ -233,8 +263,12 @@ if __name__ == '__main__':
             password = userinfo[1]
         print('开始执行第{}个账号：{}'.format((i+1),phone))
         if phone == "" or password == "":
-            print("未填写相应变量 退出")
-            exit(0)
-        main(phone, password)
+            print("当前账号未填写手机号或者密码 跳过")
+            print("\n")
+            continue
+        p = threading.Thread(target=start,args=(phone,password))
+        l.append(p)
+        p.start()
         print("\n")
-
+    for i in l:
+        i.join()
