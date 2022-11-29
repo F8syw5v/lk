@@ -22,10 +22,10 @@ from requests import post, get, packages
 packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ":HIGH:!DH:!aNULL"
 from datetime import datetime, timedelta
 from asyncio import wait, sleep, run
-from tools.ql_api import get_envs, disable_env, post_envs, put_envs
+from ql_api import get_envs, disable_env, post_envs, put_envs
 
-from tools.tool import timestamp, get_environ, print_now
-from tools.send_msg import push
+from tool import timestamp, get_environ, print_now
+from send_msg import push
 from china_telecom import ChinaTelecom
 import threading
 
