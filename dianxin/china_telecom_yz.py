@@ -12,6 +12,7 @@
 2. cron说明 12点必须执行一次(用于兑换) 然后12点之外还需要执行一次(用于执行每日任务) 一天共两次 可直接使用默认cron
 3. 环境变量说明:
     变量名(必须)：  TELECOM_PHONE_PASSWORD  格式： 手机号&服务密码，1317xxx1322&123456
+    单个CK塞多个账号时，以#分隔开：手机号&服务密码#手机号&服务密码，1317xxx1322&123456#1317xxx1322&123456
     选填  TELECOM_FOOD  : 给宠物喂食次数 默认为0 不喂食 根据用户在网时长 每天可以喂食5-10次
 4. 必须登录过 电信营业厅 app的账号才能正常运行
 """
@@ -27,13 +28,14 @@ from time import sleep, strftime
 from re import findall
 from requests import get, post
 from base64 import b64encode
-from tools.aes_encrypt import AES_Ctypt
-from tools.rsa_encrypt import RSA_Encrypt
-from tools.tool import timestamp, get_environ, print_now
-from tools.ql_api import get_envs, disable_env, post_envs, put_envs
-from tools.send_msg import push
-from login.telecom_login import TelecomLogin
+from aes_encrypt import AES_Ctypt
+from rsa_encrypt import RSA_Encrypt
+from tool import timestamp, get_environ, print_now
+from ql_api import get_envs, disable_env, post_envs, put_envs
+from send_msg import push
+from telecom_login import TelecomLogin
 from string import ascii_letters, digits
+import threading
 
 
 
@@ -402,7 +404,6 @@ class ChinaTelecom:
 #获取ck
 def get_cookie():
     ck_list = []
-    pin = "null"
     cookie = None
     cookies = get_envs("TELECOM_PHONE_PASSWORD")
     for ck in cookies:
@@ -412,8 +413,45 @@ def get_cookie():
         print('共配置{}条CK,请添加环境变量,或查看环境变量状态'.format(len(ck_list)))
     return ck_list 
 
-if __name__ == "__main__":
-    user_map = get_cookie()
+
+
+
+def start(phone,password):
+    if phone == "":
+        exit(0)
+    if password == "":
+        print_now("电信服务密码未提供 只执行部分任务")
+    if datetime.now().hour + (8 - int(strftime("%z")[2])) == 12:
+        telecom = ChinaTelecom(phone, password, False)
+        telecom.init()
+        telecom.convert_reward()
+    else:
+        telecom = ChinaTelecom(phone, password)
+        telecom.main()
+    print("\n")
+    print("\n")
+
+
+
+
+if __name__ == '__main__':
+    l = []
+    user_map = []
+    cklist = get_cookie()
+    for i in range(len(cklist)):
+        #以#分割开的ck
+        split1 = cklist[i].split("#")
+        if len(split1)>1:
+            for j in range(len(split1)):
+                split2 = split1[j].split("&")
+                if len(split2)>1:
+                    user_map.append(split1[j])
+        else:
+            userinfo = cklist[i].split("&")
+            if len(userinfo)>1:
+                user_map.append(cklist[i])
+
+
     foods = int(float(get_environ("TELECOM_FOOD", 0, False)))
     for i in range(len(user_map)):
         phone=""
@@ -424,16 +462,15 @@ if __name__ == "__main__":
             password = userinfo[1]
         print('开始执行第{}个账号：{}'.format((i+1),phone))
         if phone == "":
-            exit(0)
-        if password == "":
-            print_now("电信服务密码未提供 只执行部分任务")
-        if datetime.now().hour + (8 - int(strftime("%z")[2])) == 12:
-            telecom = ChinaTelecom(phone, password, False)
-            telecom.init()
-            telecom.convert_reward()
-        else:
-            telecom = ChinaTelecom(phone, password)
-            telecom.main()
+            print("当前账号未填写手机号 跳过")
+            print("\n")
+            continue
+        p = threading.Thread(target=start,args=(phone,password))
+        l.append(p)
+        p.start()
         print("\n")
-        print("\n")
-china_telecom.py
+    for i in l:
+        i.join()
+
+
+        
