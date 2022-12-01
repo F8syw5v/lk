@@ -165,36 +165,42 @@ class ChinaTelecom:
         #print(self.telecom_encrypt(f'{{"phone":{self.phone}}}'))
         data = self.req(url, "post", body)
         # print(dumps(data, indent=2, ensure_ascii=0))
-        #print(data)
-        recordNum = data["recordNum"]
-        totalday = data['totalDay']
-        print(f'当前可兑换次数：{recordNum}')
-        print(f'当前已签到天数：{totalday}')
-        self.msg += f'当前可兑换次数：{recordNum}\n当前已签到天数：{totalday}\n'
-        if recordNum != 0:
-            print('准备去兑换话费。。。')
-            return data["date"]["id"]
-        return ""
+        
+        if 'recordNum' in data:
+            recordNum = data["recordNum"]
+            totalday = data['totalDay']
+            print(f'当前可兑换次数：{recordNum}')
+            print(f'当前已签到天数：{totalday}')
+            self.msg += f'当前可兑换次数：{recordNum}\n当前已签到天数：{totalday}\n'
+            if recordNum != 0:
+                print('准备去兑换话费。。。')
+                return data["date"]["id"]
+            return ""
+        else:
+            print('接口未返回正确数据')
+            print('尝试使用固定id兑换')
+            print(data)
+            return "baadc927c6ed4d8a95e28fa3fc68cb9"
 
     # 若连续签到为7天 则兑换
     def convert_reward(self):
         url = "https://wapside.189.cn:9001/jt-sign/reward/convertReward"
         rewardId = self.query_signinfo()  # "baadc927c6ed4d8a95e28fa3fc68cb9"
         if rewardId == "":
-            
+            print('不兑换，退出')
             return
         body = {
             "para": self.telecom_encrypt(
                 f'{{"phone":"{self.phone}","rewardId":"{rewardId}","month":"{date.today().__format__("%Y%m")}"}}')
         }
-        for i in range(8):
+        for i in range(12):
             data = self.req(url, "post", body)
             print_now(data)
             if data["code"] == "0":
                 break
             if '已完成兑换' in data['msg'] or '成功' in data['msg'] or  '点以后开始兑换' in data['msg']:
                 break
-            sleep(5)
+            sleep(8)
         rewardId = self.query_signinfo()
         if rewardId == "":
             self.msg += f"账号{self.phone}连续签到7天兑换话费成功\n"
@@ -227,15 +233,16 @@ class ChinaTelecom:
                 self.food()
                 '''
         self.convert_reward()
-        
+        '''
         if datetime.now().day == 1:
             self.get_level()
+            '''
         self.coin_info()
         print(f"账号{self.phone} 当前有金豆{self.coin_count['totalCoin']}")
         self.msg += f"账号{self.phone} 当前有金豆{self.coin_count['totalCoin']}"
         #print(self.msg + '\n\n')
-        return self.msg + '\n\n'
-        #push("电信app签到", self.msg)
+        #return self.msg + '\n\n'
+        push("电信app签到", self.msg)
 
 
 
@@ -245,22 +252,20 @@ if __name__ == "__main__":
     c = 0
     l = []
     msg = ''
-    shuffle(phone_numArr)
+    #shuffle(phone_numArr)
     print(phone_numArr)
+    u = []
     for i in phone_numArr:
-        c = c + 1
-        print('\n账户' + str(c) + '：' + str(i) + '\n')
-        '''
-        p = threading.Thread(target=ChinaTelecom(i).main(msg), args=(i,))
-        l.append(p)
-        p.start()
- '''
-        if "@" in i:
-            msg += ChinaTelecom(i.split('@')[0]).main()
-        else:
-            msg += ChinaTelecom(i).main()
+        #c = c + 1
+        #print('\n账户' + str(c) + '：' + str(i) + '\n')
+        u.append(
+            threading.Thread(target=ChinaTelecom(i.split('@')[0]).main)
+        )
+    for thread in u:
+        thread.start()
+    for thread in u:
+        thread.join()
         
-    print(msg)
-    send("电信app签到", msg)
+
     exit(0)
     
